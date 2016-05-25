@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.tarena.netctoss.dao.AdminDao">
+
+	<select id="findByAdminCode" parameterType="string"
+		resultType="com.tarena.netctoss.entity.Admin">
+		select * from admin_info
+		where admin_code=#{admin_code}
+	</select>
+	
+	<select id="findPrivilegesByAdminId" parameterType="int" 
+	resultType="com.tarena.netctoss.entity.Privilege">
+		select * from privilege_info where id in(
+		select distinct rp.privilege_id 
+		from role_privilege rp,
+		admin_role ar
+		where rp.role_id=ar.role_id
+		and ar.admin_id=#{adminId}
+		)order by id
+	</select>
+		
+	
+	<select id="findRolesByAdminId" parameterType="int" resultType="com.tarena.netctoss.entity.Role">
+		select * from role_info
+		where id in
+		(select role_id from admin_role
+		where admin_id=#{admin_id})
+	</select>
+		
+	<resultMap type="com.tarena.netctoss.entity.Admin" id="adminMap">
+		<id column="id" property="id"/>
+		<collection property="roles" javaType="java.util.ArrayList"
+		  	ofType="com.tarena.netctoss.entity.Role"
+		  	column="id"
+		  	select="findRolesByAdminId"></collection>
+	</resultMap>
+	<select id="findByPage" parameterType="com.tarena.netctoss.entity.page.AdminPage"
+		resultMap="adminMap">
+	
+		select * from (
+		select e.*,rownum rn from (
+		select * from admin_info ai
+		where ai.id in(
+		select admin_id from 
+		admin_role ar,
+		role_privilege rp,
+		role_info ri
+		where 
+		rp.role_id=ar.role_id
+		and
+		ri.id=rp.role_id
+			<if test="privilegeId!=null&amp;&amp;privilegeId!=-1">
+				and rp.privilege_id=#{privilegeId}
+			</if>
+			<if test="roleName!=null&amp;&amp;roleName.length()>0">
+				and ri.name like '%'||#{roleName}||'%'
+			</if>		
+		<![CDATA[
+		 )
+		 )e 
+		where rownum<=#{end})
+		where rn>#{begin}
+		]]>
+	</select>
+	
+	<select id="findRows" resultType="int" parameterType="com.tarena.netctoss.entity.page.AdminPage">
+		select count(*) from admin_info ai
+		where ai.id in(
+		select admin_id from 
+		admin_role ar,
+		role_privilege rp,
+		role_info ri
+		where 
+		rp.role_id=ar.role_id
+		and
+		ri.id=rp.role_id
+			<if test="privilegeId!=null&amp;&amp;privilegeId!=-1">
+				and rp.privilege_id=#{privilegeId}
+			</if>
+			<if test="roleName!=null&amp;&amp;roleName.length()>0">
+				and ri.name like '%'||#{roleName}||'%'
+			</if>	)
+	</select>
+	
+	
+	<update id="updatePassword" parameterType="java.util.Map" >
+		update admin_info set password=#{password}
+		where id in
+		<foreach collection="ids" separator="," open="(" close=")" item="id">
+			#{id}
+		</foreach>
+	</update>
+	
+	
+	<delete id="deleteAdminRoles" parameterType="int">
+		delete from admin_role where admin_id=#{id}
+	</delete>
+	<delete id="deleteAdmin" parameterType="int">
+		delete from admin_info where id=#{id}
+	</delete>
+	
+	
+	
+	<insert id="saveAdmin" parameterType="com.tarena.netctoss.entity.Admin">
+		<selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
+			select admin_seq.nextval from dual
+		</selectKey>
+		insert into admin_info values(
+			#{id},#{admin_code},#{password},
+			#{name},#{telephone},#{email}
+		)	
+	</insert>
+	
+	<insert id="saveAdminRoles" parameterType="hashMap">
+		insert into admin_role values(
+			#{admin_id},
+			#{role_id}
+		)
+	</insert>
+	
+	<select id="findById" parameterType="int" resultMap="adminMap">
+		select id,admin_code,name,password,email,telephone
+		from admin_info where id=#{id}	
+	</select>
+	
+	<update id="update" parameterType="com.tarena.netctoss.entity.Admin">
+		update admin_info 
+		set name=#{name},telephone=#{telephone},email=#{email}
+		where id=#{id}
+	</update>
+		
+	<select id="findAdminIdByRoleId" parameterType="int" resultType="int">
+		select admin_id from admin_role where role_id=#{id}
+	</select>
+		
+</mapper>
+
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.tarena.netctoss.dao.RoleDao">
+
+	<resultMap type="com.tarena.netctoss.entity.Role" id="roleResultMap">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<collection property="privileges" 
+		javaType="java.util.ArrayList"
+		ofType="com.tarena.netctoss.entity.Privilege"
+		column="id"		
+		select="getPrivileges"
+		>
+		</collection>
+	</resultMap>
+	<select id="getPrivileges" parameterType="int" resultType="com.tarena.netctoss.entity.Privilege">
+		select id,name from privilege_info 
+		where id in(select privilege_id from role_privilege
+		where role_id =#{id})	
+	</select>
+ 	<select id="findByPage" parameterType="com.tarena.netctoss.entity.page.RolePage"
+ 		resultMap="roleResultMap">
+ 		select id,name from 
+ 		(select id,name,rownum r
+ 		from role_info
+ 		<![CDATA[
+ 		where rownum<=#{end})
+ 		where r>#{begin}
+ 		]]>
+ 	</select>
+	
+	<select id="findRows" parameterType="com.tarena.netctoss.entity.page.RolePage" resultType="int">
+		select count(*) from role_info
+	</select>
+	<select id="findAll" resultType="com.tarena.netctoss.entity.Role">
+		select * from role_info
+	</select>
+	
+	<insert id="addRole" parameterType="com.tarena.netctoss.entity.Role">
+		<selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
+			select role_seq.nextval from dual
+		</selectKey>
+		insert into role_info values(#{id},#{name})
+	</insert>
+	<insert id="addRolePrivilege" parameterType="hashMap">
+		insert into role_privilege values(#{role_id},#{privilege_id})
+	</insert>
+	
+	<delete id="deleteRolePrivileges" parameterType="java.lang.Integer">
+		delete from role_privilege where role_id=#{id}
+	</delete>
+	
+	<delete id="deleteRole" parameterType="int">
+		delete from role_info where id=#{id}
+	</delete>
+	
+	<select id="findRole" parameterType="int" resultMap="roleResultMap">
+		select id,name from role_info where id=#{id}
+	</select>
+	
+	<update id="update" parameterType="com.tarena.netctoss.entity.Role">
+		update role_info set name=#{name} where id=#{id}
+	</update>
+	
+</mapper>
