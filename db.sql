@@ -201,19 +201,32 @@ INSERT INTO product_info VALUES
 commit;
 
 
-select * from product_info;
+
+--导航库
+CREATE TABLE navigation
+(
+id NUMBER(4) PRIMARY KEY,
+logoName  VARCHAR2(30),
+netAddress VARCHAR2(100)
+);
+--添加序列
+CREATE SEQUENCE navigation_seq;
+INSERT INTO navigation VALUES
+(navigation_seq.nextval,'绿色食品','http://baike.baidu.com/view/630990.htm');
+INSERT INTO navigation VALUES
+(navigation_seq.nextval,'无公害食品','http://baike.baidu.com/view/3506628.htm');
+INSERT INTO navigation VALUES
+(navigation_seq.nextval,'有机食品','http://baike.baidu.com/view/2473484.htm');
+INSERT INTO navigation VALUES
+(navigation_seq.nextval,'QS认证','http://baike.baidu.com/view/688619.htm');
+commit;
+
+select * from navigation;
 
 
-select * from (
-		select e.*,rownum rn from (
-		select * from admin_info ai
-		where ai.id in(
-		select admin_id from 
-		admin_role ar,
-		role_privilege rp,
-		role_info ri
-		where 
-		rp.role_id=ar.role_id
-		and
-		ri.id=rp.role_id)
+
+select * from navigation
+		where id=1
+		
+		/productSafety/src/com/shidan/product/entity/Navigation.java
 

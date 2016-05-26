@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.shidan.product.dao.ProductDao">
+
+	<select id="findByProductId" parameterType="string"
+		resultType="com.shidan.product.entity.Product">
+		select * from product_info
+		where product_id=#{product_id}
+	</select>
+	
+	<select id="findByPage" parameterType="hashMap"
+	resultType="com.shidan.product.entity.Product">
+	
+		select * from (
+		select e.*,rownum rn from (
+		select id,product_id,product_name,product_weight,product_area,product_brand,safety_index,
+		createDate,expireDate,energy,protein,fat,carbohydrate,sodium from product_info
+		<![CDATA[
+		 )e 
+		where rownum<=#{end})
+		where rn>#{begin}
+		]]>
+	</select>
+	
+	<select id="findRows" resultType="int">
+		select count(*) from product_info pi
+	</select>
+
+	<delete id="deleteProd" parameterType="int">
+		delete from product_info where id=#{id}
+	</delete>
+	
+	<insert id="saveProduct" parameterType="com.shidan.product.entity.Product">
+		<selectKey keyProperty="id" resultType="java.lang.Integer" order="BEFORE">
+			select product_info_seq.nextval from dual
+		</selectKey>
+		insert into product_info values(
+			#{id},#{product_id},#{product_name},
+			#{product_weight},#{product_area},#{product_brand},#{safety_index},
+			sysdate,#{expireDate},#{energy},#{protein},#{fat},#{carbohydrate},#{sodium}		
+		)	
+	</insert>
+	
+	
+	<select id="findById" parameterType="int" resultType="com.shidan.product.entity.Product">
+		select * from product_info where id=#{id}	
+	</select>
+	
+	<update id="update" parameterType="com.shidan.product.entity.Product">
+		update product_info 
+		set product_id=#{product_id},product_name=#{product_name},product_weight=#{product_weight},
+		product_area=#{product_area},product_brand=#{product_brand},safety_index=#{safety_index},
+		energy=#{energy},protein=#{protein},fat=#{fat},
+		carbohydrate=#{carbohydrate},sodium=#{sodium}	
+		where id=#{id}
+	</update>
+		
+</mapper>
+
+

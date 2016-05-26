@@ -35,7 +35,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             //通过条形码查询
             function selectProduct(productId) {
             alert(productId);
-                window.location.href="product/findByProductId.do?product_id="+productId;
+                window.location.href="product/findByProductId.do?product_id="+product_id;
             }
             //提交表单
             function getSubmit(cp) {
@@ -63,8 +63,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         <div id="main">
             <form action="product/findByPage.do" id="mainForm" method="post">
                 <!--查询-->
-                 <div>条形码：<input type="text" name="product_id" value="${prod.product_id}" class="text_search width200" />
-                <input type="submit" value="搜索" class="btn_search" onclick="return selectProduct(${product_id});"/>
+                 <div>条形码：<input type="text" name="product_id" class="text_search width200" />
+                <input type="submit" value="搜索" class="btn_search" onclick="return selectProduct(${prod.product_id});"/>
                 </div>
                 <div class="search_add">
                     <input type="button" value="增加" class="btn_add" onclick="location.href='product/toAdd.do';" />

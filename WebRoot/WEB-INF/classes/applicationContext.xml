@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
-	<context:component-scan base-package="com.tarena.netctoss"></context:component-scan>
+	<context:component-scan base-package="com.shidan.product"></context:component-scan>
 	<mvc:annotation-driven></mvc:annotation-driven>
 	
 	<!-- 配置视图查看器 -->
@@ -35,13 +35,13 @@
 	<!-- 定义一个sqlSessionFactroy bean -->
 	<bean name="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource"></property>
-		<property name="mapperLocations" value="classpath:com/tarena/netctoss/entity/*.xml"></property>
+		<property name="mapperLocations" value="classpath:com/shidan/product/entity/*.xml"></property>
 	</bean>
 	
 	<!-- 配置MapperFacotryBean -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.tarena.netctoss.dao"></property>
-		<property name="annotationClass" value="com.tarena.netctoss.annotation.MyAnnotation"></property>
+		<property name="basePackage" value="com.shidan.product.dao"></property>
+		<property name="annotationClass" value="com.shidan.product.annotation.MyAnnotation"></property>
 	</bean>
 	
 	<!-- 配置拦截器 -->
@@ -50,19 +50,19 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<mvc:exclude-mapping path="/login/*"/>
-			<bean class="com.tarena.netctoss.interceptor.LoginInterceptor"></bean>
+			<bean class="com.shidan.product.interceptor.LoginInterceptor"></bean>
 		</mvc:interceptor>
 		<!-- 当前模块拦截器 -->
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
-			<bean class="com.tarena.netctoss.interceptor.CurrentModuleInterceptor"></bean>
+			<bean class="com.shidan.product.interceptor.CurrentModuleInterceptor"></bean>
 		</mvc:interceptor>
 		
 		<!-- 权限拦截器 -->
 		<mvc:interceptor>
 			<mvc:mapping path="/**"/>
 			<mvc:exclude-mapping path="/login/*"/>
-			<bean class="com.tarena.netctoss.interceptor.PrivilegeInterceptor"></bean>
+			<bean class="com.shidan.product.interceptor.PrivilegeInterceptor"></bean>
 		</mvc:interceptor>
 		
 	</mvc:interceptors>
